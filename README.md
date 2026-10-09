@@ -62,7 +62,7 @@ Password → BCrypt Verify → PasswordHash
 - Consulta de usuarios
 - Actualización de usuarios
 - Eliminación de usuarios
-- Manejo de roles
+- Registro con fecha de nacimiento, universidad y semestre (la edad se calcula)
 - Consumo de API REST desde Android
 
 ## 🔗 Endpoints

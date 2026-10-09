@@ -17,7 +17,7 @@ public class ApplicationDbContext : DbContext
     {
         m.Entity<Usuario>(e =>
         {
-            e.ToTable("Usuarios");
+            e.ToTable("usuarios");
 
             e.HasKey(x => x.Id);
 
@@ -30,6 +30,17 @@ public class ApplicationDbContext : DbContext
                 .IsRequired();
 
             e.Property(x => x.Correo)
+                .HasMaxLength(150)
+                .IsRequired();
+
+            e.Property(x => x.PasswordHash)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            e.Property(x => x.FechaNacimiento)
+                .HasColumnType("date");
+
+            e.Property(x => x.Universidad)
                 .HasMaxLength(150)
                 .IsRequired();
 

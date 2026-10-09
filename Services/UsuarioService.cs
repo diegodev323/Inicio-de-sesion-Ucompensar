@@ -1,5 +1,6 @@
 using UsuariosApi.DTOs;
 using UsuariosApi.Entities;
+using UsuariosApi.Helpers;
 using UsuariosApi.Interfaces;
 
 namespace UsuariosApi.Services;
@@ -13,9 +14,9 @@ public class UsuarioService : IUsuarioService
         _repo = repo;
     }
 
-    // ==========================================
+  
     // OBTENER TODOS
-    // ==========================================
+  
     public async Task<List<UsuarioDto>> ObtenerTodosAsync()
     {
         var usuarios = await _repo.ObtenerTodosAsync();
@@ -25,9 +26,9 @@ public class UsuarioService : IUsuarioService
             .ToList();
     }
 
-    // ==========================================
+
     // OBTENER POR ID
-    // ==========================================
+    
     public async Task<UsuarioDto?> ObtenerPorIdAsync(int id)
     {
         var usuario = await _repo.ObtenerPorIdAsync(id);
@@ -37,9 +38,9 @@ public class UsuarioService : IUsuarioService
             : Map(usuario);
     }
 
-    // ==========================================
+
     // CREAR USUARIO
-    // ==========================================
+ 
     public async Task<UsuarioDto> CrearAsync(CrearUsuarioDto d)
     {
         var correo = d.Correo
@@ -58,14 +59,22 @@ public class UsuarioService : IUsuarioService
         var passwordHash =
             BCrypt.Net.BCrypt.HashPassword(d.Password);
 
+        // Validar y convertir la fecha de nacimiento (yyyy-MM-dd)
+
+        var fechaNac =
+            FechaHelper.ParsearFechaNacimiento(d.FechaNacimiento);
+
         var usuario = new Usuario
         {
             Nombre = d.Nombre.Trim(),
             Apellido = d.Apellido.Trim(),
             Correo = correo,
             PasswordHash = passwordHash,
-            Edad = d.Edad,
-            RolId = d.RolId
+            FechaNacimiento = fechaNac,
+            Universidad = d.Universidad.Trim(),
+            Semestre = d.Semestre,
+            Activo = true,
+            FechaCreacion = DateTime.Now
         };
 
         await _repo.CrearAsync(usuario);
@@ -73,9 +82,9 @@ public class UsuarioService : IUsuarioService
         return Map(usuario);
     }
 
-    // ==========================================
+   
     // LOGIN
-    // ==========================================
+  
     public async Task<UsuarioDto?> LoginAsync(LoginDto dto)
     {
         var correo = dto.Correo
@@ -155,7 +164,10 @@ public class UsuarioService : IUsuarioService
         usuario.Nombre = d.Nombre.Trim();
         usuario.Apellido = d.Apellido.Trim();
         usuario.Correo = correo;
-        usuario.Edad = d.Edad;
+        usuario.FechaNacimiento =
+            FechaHelper.ParsearFechaNacimiento(d.FechaNacimiento);
+        usuario.Universidad = d.Universidad.Trim();
+        usuario.Semestre = d.Semestre;
         usuario.Activo = d.Activo;
 
         await _repo.ActualizarAsync(usuario);
@@ -181,9 +193,7 @@ public class UsuarioService : IUsuarioService
         return true;
     }
 
-    // ==========================================
-    // MAPEO ENTITY -> DTO
-    // ==========================================
+
     private static UsuarioDto Map(Usuario u)
     {
         return new UsuarioDto
@@ -192,7 +202,14 @@ public class UsuarioService : IUsuarioService
             Nombre = u.Nombre,
             Apellido = u.Apellido,
             Correo = u.Correo,
-            Edad = u.Edad,
+            Edad = FechaHelper.CalcularEdad(
+                u.FechaNacimiento,
+                DateOnly.FromDateTime(DateTime.Today)),
+            FechaNacimiento = u.FechaNacimiento.ToString(
+                FechaHelper.Formato,
+                System.Globalization.CultureInfo.InvariantCulture),
+            Universidad = u.Universidad,
+            Semestre = u.Semestre,
             Activo = u.Activo,
             FechaCreacion = u.FechaCreacion
         };

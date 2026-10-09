@@ -4,21 +4,24 @@ namespace UsuariosApi.DTOs;
 
 public class ActualizarUsuarioDto
 {
-    [Required]
-    [MaxLength(100)]
+    [Required, MaxLength(100)]
     public string Nombre { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(100)]
+    [Required, MaxLength(100)]
     public string Apellido { get; set; } = string.Empty;
 
-    [Required]
-    [EmailAddress]
-    [MaxLength(150)]
+    [Required, EmailAddress, MaxLength(150)]
     public string Correo { get; set; } = string.Empty;
 
-    [Range(1, 120)]
-    public int Edad { get; set; }
 
-    public bool Activo { get; set; }
+    [Required]
+    public string FechaNacimiento { get; set; } = string.Empty;
+
+    [Required, MaxLength(150)]
+    public string Universidad { get; set; } = string.Empty;
+
+    [Range(1, 10, ErrorMessage = "El semestre debe estar entre 1 y 10.")]
+    public int Semestre { get; set; }
+
+    public bool Activo { get; set; } = true;
 }
